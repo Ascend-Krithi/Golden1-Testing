@@ -1,0 +1,92 @@
+{
+  "test_cases": [
+    {
+      "testCaseId": "TC-001",
+      "testCaseDescription": "Test Case TC-001",
+      "AcceptanceCriteriaId": "AC-123",
+      "IssueId": "",
+      "testSteps": [
+        {
+          "Step_ID": 1,
+          "Step_Desc": "Login as valid_user [Test Data: {'username': 'valid_user'}] [Acceptance Criteria: AC-123]",
+          "Expected_Result": "Login successful",
+          "Test_Data": "username: valid_user"
+        },
+        {
+          "Step_ID": 2,
+          "Step_Desc": "Navigate to Payments [Acceptance Criteria: AC-123]",
+          "Expected_Result": "Payments page displayed",
+          "Test_Data": ""
+        },
+        {
+          "Step_ID": 3,
+          "Step_Desc": "Enter payment details [Test Data: {'accountType': 'Savings', 'amount': '100.00'}] [Acceptance Criteria: AC-123]",
+          "Expected_Result": "Payment details accepted",
+          "Test_Data": "accountType: Savings, amount: 100.00"
+        },
+        {
+          "Step_ID": 4,
+          "Step_Desc": "Submit payment [Acceptance Criteria: AC-123]",
+          "Expected_Result": "Payment processed",
+          "Test_Data": ""
+        }
+      ],
+      "testScenarioId": ""
+    },
+    {
+      "testCaseId": "TASK0020445 TS-001 TC-001",
+      "testCaseDescription": "Verify that the homepage opens successfully when the website address is entered in the browser.",
+      "AcceptanceCriteriaId": "AC-1",
+      "IssueId": "TASK0020445",
+      "testSteps": [
+        {
+          "Step_ID": 1,
+          "Step_Desc": "Launch a supported web browser (e.g., Chrome, Firefox, Edge). [Acceptance Criteria: AC-1]",
+          "Expected_Result": "Browser opens successfully.",
+          "Test_Data": ""
+        },
+        {
+          "Step_ID": 2,
+          "Step_Desc": "Enter the URL 'https://www.golden1.com/' in the browser address bar and press Enter. [Test Data: URL: https://www.golden1.com/] [Acceptance Criteria: AC-1]",
+          "Expected_Result": "Golden 1 homepage starts loading.",
+          "Test_Data": "URL: https://www.golden1.com/"
+        },
+        {
+          "Step_ID": 3,
+          "Step_Desc": "Wait for the page to finish loading. [Acceptance Criteria: AC-1]",
+          "Expected_Result": "Golden 1 homepage is displayed without errors.",
+          "Test_Data": ""
+        }
+      ],
+      "testScenarioId": "TS-001"
+    },
+    {
+      "testCaseId": "TASK0020445 TS-001 TC-001",
+      "testCaseDescription": "Verify that the homepage opens successfully when the website address is entered in the browser.",
+      "AcceptanceCriteriaId": "1",
+      "IssueId": "TASK0020445",
+      "testSteps": [
+        {
+          "Step_ID": 1,
+          "Step_Desc": "Launch a supported web browser (e.g., Chrome, Firefox, Edge). [Acceptance Criteria: 1]",
+          "Expected_Result": "Browser is launched successfully.",
+          "Test_Data": ""
+        },
+        {
+          "Step_ID": 2,
+          "Step_Desc": "Enter the URL 'https://www.golden1.com/' in the address bar and press Enter. [Test Data: Website URL: https://www.golden1.com/] [Acceptance Criteria: 1]",
+          "Expected_Result": "Golden 1 homepage begins to load.",
+          "Test_Data": "Website URL: https://www.golden1.com/"
+        },
+        {
+          "Step_ID": 3,
+          "Step_Desc": "Wait for the homepage to finish loading. [Acceptance Criteria: 1]",
+          "Expected_Result": "Golden 1 homepage is displayed without errors.",
+          "Test_Data": ""
+        }
+      ],
+      "testScenarioId": "TS-001"
+    }
+    // ... (other test cases omitted for brevity, but would be included in the actual commit)
+  ]
+}
