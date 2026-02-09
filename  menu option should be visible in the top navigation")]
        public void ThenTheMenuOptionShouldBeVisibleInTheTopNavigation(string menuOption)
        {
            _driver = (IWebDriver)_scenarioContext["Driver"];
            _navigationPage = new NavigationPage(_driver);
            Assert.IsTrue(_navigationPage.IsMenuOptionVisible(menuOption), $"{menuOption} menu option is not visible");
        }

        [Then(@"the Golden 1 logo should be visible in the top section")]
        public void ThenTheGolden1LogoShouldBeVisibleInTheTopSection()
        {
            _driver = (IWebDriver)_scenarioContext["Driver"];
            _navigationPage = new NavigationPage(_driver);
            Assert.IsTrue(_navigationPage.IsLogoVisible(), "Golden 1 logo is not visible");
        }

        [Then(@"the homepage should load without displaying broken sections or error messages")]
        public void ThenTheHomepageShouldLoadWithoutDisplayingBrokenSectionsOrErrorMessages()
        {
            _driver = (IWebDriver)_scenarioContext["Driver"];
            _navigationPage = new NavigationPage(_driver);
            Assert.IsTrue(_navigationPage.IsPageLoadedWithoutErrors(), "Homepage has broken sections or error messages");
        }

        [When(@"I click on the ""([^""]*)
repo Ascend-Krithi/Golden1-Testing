@@ -1,0 +1,18 @@
+ menu option")]
+        public void WhenIClickOnTheMenuOption(string menuOption)
+        {
+            _driver = (IWebDriver)_scenarioContext["Driver"];
+            _navigationPage = new NavigationPage(_driver);
+            _navigationPage.ClickMenuOption(menuOption);
+            WaitHelper.WaitForPageLoad(_driver);
+        }
+
+        [Then(@"the navigation should not result in errors")]
+        public void ThenTheNavigationShouldNotResultInErrors()
+        {
+            _driver = (IWebDriver)_scenarioContext["Driver"];
+            _navigationPage = new NavigationPage(_driver);
+            Assert.IsTrue(_navigationPage.IsPageLoadedWithoutErrors(), "Navigation resulted in errors");
+        }
+    }
+}
