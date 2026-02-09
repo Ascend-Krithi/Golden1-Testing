@@ -1,0 +1,27 @@
+ menu option should be visible")]
+        public void ThenTheMenuOptionShouldBeVisible(string menuOption)
+        {
+            Assert.IsTrue(_navigationPage.IsMenuOptionVisible(menuOption), $"{menuOption} menu option is not visible");
+        }
+
+        [Then(@"the Golden1 logo should be visible")]
+        public void ThenTheGolden1LogoShouldBeVisible()
+        {
+            Assert.IsTrue(_navigationPage.IsLogoVisible(), "Golden1 logo is not visible");
+        }
+
+        [Then(@"no broken sections should be visible")]
+        public void ThenNoBrokenSectionsShouldBeVisible()
+        {
+            Assert.IsTrue(_navigationPage.IsPageLoadedWithoutErrors(), "Page has broken sections or errors");
+        }
+
+        [Then(@"the page URL should contain ""([^""]*)""")]
+        public void ThenThePageURLShouldContain(string expectedUrlPart)
+        {
+            WaitHelper.WaitForUrlToContain(_driver, expectedUrlPart);
+            string currentUrl = _driver.Url.ToLower();
+            Assert.That(currentUrl.Contains(expectedUrlPart.ToLower()), $"URL does not contain expected part: {expectedUrlPart}");
+        }
+    }
+}
