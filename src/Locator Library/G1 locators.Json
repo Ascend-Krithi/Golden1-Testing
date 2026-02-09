@@ -1,0 +1,98 @@
+{
+  "NavigationLocators": {
+    "TopNavBar": {
+      "type": "css",
+      "value": "header nav" 
+    },
+    "Logo": {
+      "type": "css",
+      "value": "header .logo img"
+    },
+    "OpenAccountButton": {
+      "type": "xpath",
+      "value": "//a[normalize-space()='Open Account']"
+    },
+    "LoginButton": {
+      "type": "xpath",
+      "value": "//button[contains(., 'Log In') or contains(., 'Login')]"
+    },
+    "PersonalMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Personal']"
+    },
+    "BusinessMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Business']"
+    },
+    "FinancialWellnessMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Financial Wellness']"
+    },
+    "AppointmentsMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Appointments']"
+    },
+    "LocationsMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Locations']"
+    },
+    "HelpCenterMenu": {
+      "type": "xpath",
+      "value": "//nav//a[normalize-space()='Help Center']"
+    },
+    "MobileDepositLink": {
+      "type": "xpath",
+      "value": "//a[contains(normalize-space(),'Mobile Deposit')]"
+    },
+    "OnlineBankingLink": {
+      "type": "xpath",
+      "value": "//a[contains(normalize-space(),'Online Banking')]"
+    },
+    "BillPayLink": {
+      "type": "xpath",
+      "value": "//a[contains(normalize-space(),'Bill Pay')]"
+    }
+  },
+  "FooterLocators": {
+    "FooterSection": {
+      "type": "css",
+      "value": "footer"
+    },
+    "PrivacyPolicyLink": {
+      "type": "xpath",
+      "value": "//footer//a[contains(text(),'Privacy')]"
+    },
+    "TermsConditionsLink": {
+      "type": "xpath",
+      "value": "//footer//a[contains(normalize-space(),'Terms & Conditions')]"
+    },
+    "ContactUsLink": {
+      "type": "xpath",
+      "value": "//footer//a[contains(normalize-space(),'Contact Us')]"
+    }
+  },
+  "HomePageLocators": {
+    "HeroBanner": {
+      "type": "css",
+      "value": "section.hero"
+    },
+    "FeaturedProductSection": {
+      "type": "css",
+      "value": "section.products"
+    },
+    "SearchInput": {
+      "type": "css",
+      "value": "input[type='search']"
+    }
+  },
+  "OverlayLocators": {
+    "CookieAccept": {
+      "type": "xpath",
+      "value": "//button[contains(translate(text(),'ACCEPT','accept'),'accept')]"
+    },
+    "ModalClose": {
+      "type": "css",
+      "value": "button.close, button[aria-label*='Close']"
+    }
+  }
+}
