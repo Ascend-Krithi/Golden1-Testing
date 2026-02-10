@@ -1,197 +1,95 @@
-using System;
-using System.Collections.Generic;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
-using Golden1.Automation.Config;
+using System;
 
-namespace Golden1.Automation.Utilities
+namespace Project1.Automation.Utilities
 {
     public static class WaitHelper
     {
-        public static IWebElement WaitClickable(IWebDriver driver, By locator, int timeoutSeconds = 0)
+        /// <summary>
+        /// Waits for an element to be visible
+        /// </summary>
+        /// <param name="driver">WebDriver instance</param>
+        /// <param name="locator">Element locator</param>
+        /// <param name="timeoutInSeconds">Timeout in seconds</param>
+        /// <returns>WebElement if found</returns>
+        public static IWebElement WaitVisible(IWebDriver driver, By locator, int timeoutInSeconds)
         {
             try
             {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout))
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+                return wait.Until(drv => 
                 {
-                    PollingInterval = TimeSpan.FromMilliseconds(500)
-                };
-                wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
-                
-                LogHelper.Debug($"Waiting for element to be clickable: {locator}");
-                return wait.Until(ExpectedConditions.ElementToBeClickable(locator));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Element not clickable after {timeoutSeconds}s: {locator}", ex);
-                throw;
-            }
-        }
-
-        public static IWebElement WaitVisible(IWebDriver driver, By locator, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout))
-                {
-                    PollingInterval = TimeSpan.FromMilliseconds(500)
-                };
-                wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
-                
-                LogHelper.Debug($"Waiting for element to be visible: {locator}");
-                return wait.Until(ExpectedConditions.ElementIsVisible(locator));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Element not visible after {timeoutSeconds}s: {locator}", ex);
-                throw;
-            }
-        }
-
-        public static bool WaitForElementToDisappear(IWebDriver driver, By locator, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for element to disappear: {locator}");
-                return wait.Until(ExpectedConditions.InvisibilityOfElementLocated(locator));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Element still visible after {timeoutSeconds}s: {locator}", ex);
-                return false;
-            }
-        }
-
-        public static IReadOnlyCollection<IWebElement> WaitForElements(IWebDriver driver, By locator, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for elements to be present: {locator}");
-                return wait.Until(ExpectedConditions.PresenceOfAllElementsLocatedBy(locator));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Elements not found after {timeoutSeconds}s: {locator}", ex);
-                throw;
-            }
-        }
-
-        public static bool WaitForUrlContains(IWebDriver driver, string urlPart, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for URL to contain: {urlPart}");
-                return wait.Until(ExpectedConditions.UrlContains(urlPart));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"URL does not contain '{urlPart}' after {timeoutSeconds}s. Current URL: {driver.Url}", ex);
-                return false;
-            }
-        }
-
-        public static bool WaitForTextPresent(IWebDriver driver, By locator, string text, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for text '{text}' in element: {locator}");
-                return wait.Until(ExpectedConditions.TextToBePresentInElementLocated(locator, text));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Text '{text}' not present after {timeoutSeconds}s in {locator}", ex);
-                return false;
-            }
-        }
-
-        public static IAlert WaitForAlert(IWebDriver driver, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug("Waiting for alert to be present");
-                return wait.Until(ExpectedConditions.AlertIsPresent());
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Alert not present after {timeoutSeconds}s", ex);
-                throw;
-            }
-        }
-
-        public static IWebElement WaitUntilElementExists(IWebDriver driver, By locator, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for element to exist: {locator}");
-                return wait.Until(ExpectedConditions.ElementExists(locator));
-            }
-            catch (WebDriverTimeoutException ex)
-            {
-                LogHelper.Error($"Element does not exist after {timeoutSeconds}s: {locator}", ex);
-                throw;
-            }
-        }
-
-        public static bool WaitForAttributeContains(IWebDriver driver, By locator, string attribute, string value, int timeoutSeconds = 0)
-        {
-            try
-            {
-                int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeout));
-                
-                LogHelper.Debug($"Waiting for attribute '{attribute}' to contain '{value}' in {locator}");
-                return wait.Until(d =>
-                {
-                    var element = d.FindElement(locator);
-                    var attrValue = element.GetAttribute(attribute);
-                    return attrValue != null && attrValue.Contains(value);
+                    var element = drv.FindElement(locator);
+                    return element.Displayed ? element : null;
                 });
             }
-            catch (WebDriverTimeoutException ex)
+            catch (Exception ex)
             {
-                LogHelper.Error($"Attribute '{attribute}' does not contain '{value}' after {timeoutSeconds}s", ex);
+                LogHelper.Error($"Element not visible within {timeoutInSeconds} seconds: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Checks if an element is visible without throwing exception
+        /// </summary>
+        /// <param name="driver">WebDriver instance</param>
+        /// <param name="locator">Element locator</param>
+        /// <param name="timeoutInSeconds">Timeout in seconds</param>
+        /// <returns>True if element is visible, false otherwise</returns>
+        public static bool IsElementVisible(IWebDriver driver, By locator, int timeoutInSeconds)
+        {
+            try
+            {
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+                wait.Until(drv => drv.FindElement(locator).Displayed);
+                return true;
+            }
+            catch
+            {
                 return false;
             }
         }
 
         /// <summary>
-        /// Fluent wait with custom conditions and polling
+        /// Waits for page to load completely
         /// </summary>
-        public static T FluentWait<T>(IWebDriver driver, Func<IWebDriver, T> condition, 
-            int timeoutSeconds = 0, int pollingIntervalMs = 500)
+        /// <param name="driver">WebDriver instance</param>
+        /// <param name="timeoutInSeconds">Timeout in seconds</param>
+        public static void WaitForPageLoad(IWebDriver driver, int timeoutInSeconds)
         {
-            int timeout = timeoutSeconds > 0 ? timeoutSeconds : ConfigReader.TimeoutSeconds;
-            
-            var wait = new DefaultWait<IWebDriver>(driver)
+            try
             {
-                Timeout = TimeSpan.FromSeconds(timeout),
-                PollingInterval = TimeSpan.FromMilliseconds(pollingIntervalMs)
-            };
-            
-            wait.IgnoreExceptionTypes(typeof(NoSuchElementException), typeof(StaleElementReferenceException));
-            
-            return wait.Until(condition);
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+                wait.Until(drv => ((IJavaScriptExecutor)drv).ExecuteScript("return document.readyState").Equals("complete"));
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"Page did not load within {timeoutInSeconds} seconds: {ex.Message}");
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Waits for an element to be clickable
+        /// </summary>
+        /// <param name="driver">WebDriver instance</param>
+        /// <param name="locator">Element locator</param>
+        /// <param name="timeoutInSeconds">Timeout in seconds</param>
+        /// <returns>WebElement if clickable</returns>
+        public static IWebElement WaitClickable(IWebDriver driver, By locator, int timeoutInSeconds)
+        {
+            try
+            {
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutInSeconds));
+                return wait.Until(SeleniumExtras.WaitHelpers.ExpectedConditions.ElementToBeClickable(locator));
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"Element not clickable within {timeoutInSeconds} seconds: {ex.Message}");
+                throw;
+            }
         }
     }
 }
