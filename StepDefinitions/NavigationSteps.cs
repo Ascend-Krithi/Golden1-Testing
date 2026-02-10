@@ -1,75 +1,137 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium;
 using TechTalk.SpecFlow;
-using Golden1.Automation.Pages;
-using System.Linq;
+using OpenQA.Selenium;
+using Project1.Automation.Pages;
+using Project1.Automation.Utilities;
+using NUnit.Framework;
 
-namespace Golden1.Automation.StepDefinitions
+namespace Project1.Automation.StepDefinitions
 {
     [Binding]
     public class NavigationSteps
     {
-        private readonly IWebDriver _driver;
-        private readonly NavigationPage _navigationPage;
+        private readonly IWebDriver Driver;
+        private readonly HomePage homePage;
+        private readonly PersonalPage personalPage;
+        private readonly CheckingPage checkingPage;
+        private readonly FooterPage footerPage;
 
-        public NavigationSteps(ScenarioContext context)
+        public NavigationSteps(IWebDriver driver)
         {
-            _driver = (IWebDriver)context["Driver"];
-            _navigationPage = new NavigationPage(_driver);
+            Driver = driver;
+            homePage = new HomePage(Driver);
+            personalPage = new PersonalPage(Driver);
+            checkingPage = new CheckingPage(Driver);
+            footerPage = new FooterPage(Driver);
         }
 
-        [Given(@"User is on Golden1 homepage")]
-        public void GivenUserIsOnGolden1Homepage()
+        [Given(@"the user opens the Golden 1 website")]
+        public void GivenTheUserOpensTheGolden1Website()
         {
-            _navigationPage.OpenHome();
+            LogHelper.Info("Step: User opens the Golden 1 website");
+            homePage.NavigateToHomePage();
         }
 
-        [When(@"User navigates to ""(.*)"" under ""(.*)""")]
-        public void WhenUserNavigatesToUnder(string subMenu, string mainMenu)
+        [Then(@"the homepage should load successfully")]
+        public void ThenTheHomepageShouldLoadSuccessfully()
         {
-            _navigationPage.NavigateToSubMenu(mainMenu, subMenu);
+            LogHelper.Info("Step: Verifying homepage loaded successfully");
+            homePage.VerifyHomePageLoaded();
         }
 
-        [Then(@"User should be on ""(.*)"" page")]
-        public void ThenUserShouldBeOnPage(string urlPart)
+        [Then(@"the user should see the top navigation menu")]
+        public void ThenTheUserShouldSeeTheTopNavigationMenu()
         {
-            Assert.That(_navigationPage.VerifyUrlContains(urlPart), Is.True);
+            LogHelper.Info("Step: Verifying top navigation menu is visible");
+            bool isVisible = homePage.IsTopNavigationMenuVisible();
+            Assert.That(isVisible, Is.True, "Top navigation menu is not visible");
         }
 
-        // ✅ Global nav visibility
-        [Then(@"Navigation should be visible")]
-        public void ThenNavigationShouldBeVisible()
+        [When(@"the user clicks on the Personal menu")]
+        public void WhenTheUserClicksOnThePersonalMenu()
         {
-            Assert.That(_navigationPage.IsTopNavigationVisible(), Is.True,
-                "Top navigation is not visible.");
+            LogHelper.Info("Step: User clicks on Personal menu");
+            homePage.ClickPersonalMenu();
         }
 
-        // ✅ Top tab menu validation
-        [Then(@"The following menu options should be present in top navigation:")]
-        public void ThenTheFollowingMenuOptionsShouldBePresentInTopNavigation(Table table)
+        [Then(@"the Personal section page should load")]
+        public void ThenThePersonalSectionPageShouldLoad()
         {
-            var expectedMenus = table.Rows.Select(r => r["Menu"]).ToList();
-
-            foreach (var menu in expectedMenus)
-            {
-                var locator = By.XPath($"//div[contains(@class,'menu__toptabs')]//a[normalize-space()='{menu}']");
-                Assert.That(_driver.FindElement(locator).Displayed,
-                    $"Menu option '{menu}' not visible in top navigation.");
-            }
+            LogHelper.Info("Step: Verifying Personal section page loaded");
+            personalPage.VerifyPersonalPageLoaded();
         }
 
-        // 🚀 FINAL STEP — Main menu validation (TC_NAV_010)
-        [Then(@"The main menu should display the following items:")]
-        public void ThenTheMainMenuShouldDisplayTheFollowingItems(Table table)
+        [Then(@"the user should see submenu options")]
+        public void ThenTheUserShouldSeeSubmenuOptions()
         {
-            var expectedMenus = table.Rows.Select(r => r["Main Menu"]).ToList();
-            var actualMenus = _navigationPage.GetMainMenuItems();
+            LogHelper.Info("Step: Verifying submenu options are visible");
+            bool areVisible = personalPage.AreSubmenuOptionsVisible();
+            Assert.That(areVisible, Is.True, "Submenu options are not visible");
+        }
 
-            foreach (var menu in expectedMenus)
-            {
-                Assert.That(actualMenus.Contains(menu),
-                    $"Main menu item '{menu}' was not found. Actual menus: {string.Join(", ", actualMenus)}");
-            }
+        [When(@"the user selects the Checking submenu")]
+        public void WhenTheUserSelectsTheCheckingSubmenu()
+        {
+            LogHelper.Info("Step: User selects Checking submenu");
+            personalPage.ClickCheckingSubmenu();
+        }
+
+        [Then(@"the Checking page should open")]
+        public void ThenTheCheckingPageShouldOpen()
+        {
+            LogHelper.Info("Step: Verifying Checking page opened");
+            checkingPage.VerifyCheckingPageLoaded();
+        }
+
+        [Then(@"the page should display the page heading")]
+        public void ThenThePageShouldDisplayThePageHeading()
+        {
+            LogHelper.Info("Step: Verifying page heading is displayed");
+            string heading = checkingPage.GetPageHeading();
+            Assert.That(string.IsNullOrEmpty(heading), Is.False, "Page heading is not displayed");
+        }
+
+        [Then(@"the page should display section content")]
+        public void ThenThePageShouldDisplaySectionContent()
+        {
+            LogHelper.Info("Step: Verifying section content is displayed");
+            checkingPage.VerifyPageContentDisplayed();
+        }
+
+        [Then(@"the page should display product information")]
+        public void ThenThePageShouldDisplayProductInformation()
+        {
+            LogHelper.Info("Step: Verifying product information is displayed");
+            bool isVisible = checkingPage.IsProductInformationVisible();
+            Assert.That(isVisible, Is.True, "Product information is not visible");
+        }
+
+        [When(@"the user clicks Log In button")]
+        public void WhenTheUserClicksLogInButton()
+        {
+            LogHelper.Info("Step: User clicks Log In button");
+            homePage.ClickLoginButton();
+        }
+
+        [When(@"the user clicks Open Account button")]
+        public void WhenTheUserClicksOpenAccountButton()
+        {
+            LogHelper.Info("Step: User clicks Open Account button");
+            homePage.ClickOpenAccountButton();
+        }
+
+        [Then(@"the user should see the footer section")]
+        public void ThenTheUserShouldSeeTheFooterSection()
+        {
+            LogHelper.Info("Step: Verifying footer section is visible");
+            footerPage.VerifyFooterSectionVisible();
+        }
+
+        [Then(@"the footer should contain contact information")]
+        public void ThenTheFooterShouldContainContactInformation()
+        {
+            LogHelper.Info("Step: Verifying contact information in footer");
+            bool isVisible = footerPage.IsContactInformationVisible();
+            Assert.That(isVisible, Is.True, "Contact information is not visible in footer");
         }
     }
 }
