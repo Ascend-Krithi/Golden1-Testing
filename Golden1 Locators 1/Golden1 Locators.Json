@@ -1,0 +1,112 @@
+{
+  "NavigationPage": {
+
+    "MenuContainer": {
+      "type": "css",
+      "value": "nav.menu"
+    },
+
+    "TopTabsContainer": {
+      "type": "css",
+      "value": ".menu__toptabs"
+    },
+
+    "PersonalTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Personal']"
+    },
+
+    "BusinessTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Business']"
+    },
+
+    "FinancialWellnessTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Financial Wellness']"
+    },
+
+    "AppointmentsTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Appointments']"
+    },
+
+    "LocationsTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Locations']"
+    },
+
+    "MembershipTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Membership']"
+    },
+
+    "HelpCenterTab": {
+      "type": "xpath",
+      "value": "//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Help Center']"
+    },
+
+    "CheckingMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Checking']"
+    },
+
+    "SavingsMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Savings']"
+    },
+
+    "HomeLoansMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Home Loans']"
+    },
+
+    "CreditCardsMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Credit Cards']"
+    },
+
+    "LoansMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Loans']"
+    },
+
+    "InvestingMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Investing']"
+    },
+
+    "CommunityMenu": {
+      "type": "xpath",
+      "value": "//a[contains(@class,'nav-item-link') and normalize-space()='Community']"
+    },
+
+    "FreeCheckingLink": {
+      "type": "xpath",
+      "value": "//a[normalize-space()='Free Checking']"
+    },
+
+    "SavingsAccountLink": {
+      "type": "xpath",
+      "value": "//a[normalize-space()='Savings Account']"
+    },
+
+    "AutoLoansLink": {
+      "type": "xpath",
+      "value": "//a[contains(normalize-space(),'Auto Loan')]"
+    }
+  },
+
+  "OverlayLocators": {
+
+    "CookieBanner": {
+      "type": "id",
+      "value": "onetrust-banner-sdk"
+    },
+
+    "AcceptCookiesButton": {
+      "type": "id",
+      "value": "onetrust-accept-btn-handler"
+    }
+  }
+}
