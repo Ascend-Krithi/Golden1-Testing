@@ -1,50 +1,70 @@
 using System;
 using System.IO;
-using Serilog;
-using Golden1.Automation.Config;
 
 namespace Golden1.Automation.Utilities
 {
+    /// <summary>
+    /// Log Helper utility for logging
+    /// DO NOT MODIFY - Framework Core File
+    /// </summary>
     public static class LogHelper
     {
-        private static readonly ILogger _logger;
+        private static readonly string LogFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs", $"TestLog_{DateTime.Now:yyyyMMdd_HHmmss}.log");
 
         static LogHelper()
         {
-            var logPath = Path.Combine(ConfigReader.ReportPath, "Logs", 
-                $"TestLog_{DateTime.Now:yyyyMMdd}.txt");
-            
-            Directory.CreateDirectory(Path.GetDirectoryName(logPath));
-
-            _logger = new LoggerConfiguration()
-                .MinimumLevel.Debug()
-                .WriteTo.Console()
-                .WriteTo.File(logPath, rollingInterval: RollingInterval.Day,
-                    outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}")
-                .CreateLogger();
+            var logDirectory = Path.GetDirectoryName(LogFilePath);
+            if (!Directory.Exists(logDirectory))
+            {
+                Directory.CreateDirectory(logDirectory);
+            }
         }
 
+        /// <summary>
+        /// Logs an informational message
+        /// </summary>
         public static void Info(string message)
         {
-            _logger.Information(message);
+            Log("INFO", message);
         }
 
-        public static void Debug(string message)
-        {
-            _logger.Debug(message);
-        }
-
+        /// <summary>
+        /// Logs a warning message
+        /// </summary>
         public static void Warning(string message)
         {
-            _logger.Warning(message);
+            Log("WARNING", message);
         }
 
-        public static void Error(string message, Exception ex = null)
+        /// <summary>
+        /// Logs an error message
+        /// </summary>
+        public static void Error(string message)
         {
-            if (ex != null)
-                _logger.Error(ex, message);
-            else
-                _logger.Error(message);
+            Log("ERROR", message);
+        }
+
+        /// <summary>
+        /// Logs a debug message
+        /// </summary>
+        public static void Debug(string message)
+        {
+            Log("DEBUG", message);
+        }
+
+        private static void Log(string level, string message)
+        {
+            string logMessage = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] [{level}] {message}";
+            Console.WriteLine(logMessage);
+            
+            try
+            {
+                File.AppendAllText(LogFilePath, logMessage + Environment.NewLine);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to write to log file: {ex.Message}");
+            }
         }
     }
 }

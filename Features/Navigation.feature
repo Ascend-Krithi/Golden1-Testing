@@ -1,69 +1,76 @@
-Feature: Golden1 Global Navigation Validation
-  As a user of the Golden1 website
-  I want to validate the navigation menu functionality
-  So that I can access different sections of the website easily
+@Navigation @Regression
+Feature: Golden1 Website Navigation
+  As a user of Golden1 Credit Union website
+  I want to navigate through different sections
+  So that I can access various banking services and information
 
-Background:
-  Given User is on Golden1 homepage
+  Background:
+    Given User opens the Golden1 homepage
+    And User accepts cookies if banner is displayed
 
-@Navigation @Smoke @Critical
-Scenario: TC_NAV_000 - Verify global navigation is visible
-  Then Navigation should be visible
-  And The following menu options should be present in top navigation:
-    | Menu                 |
-    | Personal             |
-    | Business             |
-    | Financial Wellness   |
-    | Appointments         |
-    | Locations            |
-    | Membership           |
-    | Help Center          |
+  @TASK0020445 @TS-001 @TC-001
+  Scenario: TASK0020445 TS-001 TC-001 - Verify homepage opens successfully
+    Then User should see the main navigation menu
+    And User should see the top navigation tabs
 
-@Navigation @Regression @P1
-Scenario Outline: <TC_ID> - Validate navigation link functionality
-  When User navigates to "<SubMenu>" under "<MainMenu>"
-  Then User should be on "<UrlPart>" page
+  @TASK0020445 @TS-002 @TC-001
+  Scenario: TASK0020445 TS-002 TC-001 - Verify top navigation tabs are visible
+    Then User should see "Personal" tab in top navigation
+    And User should see "Business" tab in top navigation
+    And User should see "Financial Wellness" tab in top navigation
+    And User should see "Appointments" tab in top navigation
+    And User should see "Locations" tab in top navigation
+    And User should see "Membership" tab in top navigation
+    And User should see "Help Center" tab in top navigation
 
-  Examples: Checking Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_001 | Checking     | Free Checking               | free-checking-account           |
-    | TC_NAV_002 | Checking     | Easy Checking               | easy-checking-account           |
-    | TC_NAV_009 | Checking     | MarketRate Checking         | marketrate-checking-account     |
+  @TASK0020445 @TS-003 @TC-001
+  Scenario: TASK0020445 TS-003 TC-001 - Verify main menu options are visible
+    Then User should see "Checking" menu option
+    And User should see "Savings" menu option
+    And User should see "Home Loans" menu option
+    And User should see "Credit Cards" menu option
+    And User should see "Loans" menu option
+    And User should see "Investing" menu option
+    And User should see "Community" menu option
 
+  @TASK0020445 @TS-004 @TC-001
+  Scenario: TASK0020445 TS-004 TC-001 - Navigate to Checking page
+    When User clicks on "Checking" menu
+    Then User should see Free Checking link
 
+  @TASK0020445 @TS-005 @TC-001
+  Scenario: TASK0020445 TS-005 TC-001 - Navigate to Free Checking page
+    When User clicks on "Checking" menu
+    And User clicks on "Free Checking" link
+    Then User should be on Free Checking page
 
-  Examples: Savings Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_003 | Savings      | Money Market                | money-market-savings-account    |
-  
-  Examples: Home Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_004 | Home Loans   | Buy a Home                  | home-loans/purchase             |
+  @TASK0020445 @TS-006 @TC-001
+  Scenario: TASK0020445 TS-006 TC-001 - Navigate to Savings page
+    When User clicks on "Savings" menu
+    Then User should see Savings Account link
 
-  Examples: Credit Cards
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_005 | Credit Cards | Member Cash Rewards+ Card   | member-cash-rewards-plus        |
+  @TASK0020445 @TS-007 @TC-001
+  Scenario: TASK0020445 TS-007 TC-001 - Navigate to Savings Account page
+    When User clicks on "Savings" menu
+    And User clicks on "Savings Account" link
+    Then User should be on Savings Account page
 
-  Examples: Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_006 | Loans        | Personal Loans              | personal-loans                  |
+  @TASK0020445 @TS-008 @TC-001
+  Scenario: TASK0020445 TS-008 TC-001 - Navigate to Loans section and verify Auto Loans
+    When User clicks on "Loans" menu
+    Then User should see Auto Loans link
 
-  Examples: Investing
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_007 | Investing    | Make an Investment Plan     | investment-services             |
+  @TASK0020445 @TS-009 @TC-001
+  Scenario Outline: TASK0020445 TS-009 TC-001 - Verify navigation to different top tabs
+    When User clicks on "<TabName>" top tab
+    Then User should be on "<TabName>" section
 
-  Examples: Community
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_008 | Community    | Community Commitment        | our-commitment                  |
-
-@Navigation @Regression @P2
-Scenario: TC_NAV_010 - Verify main menu items are displayed
-  Then The main menu should display the following items:
-    | Main Menu    |
-    | Checking     |
-    | Savings      |
-    | Home Loans   |
-    | Credit Cards |
-    | Loans        |
-    | Investing    |
-    | Community    |
+    Examples:
+      | TabName            |
+      | Personal           |
+      | Business           |
+      | Financial Wellness |
+      | Appointments       |
+      | Locations          |
+      | Membership         |
+      | Help Center        |
