@@ -1,75 +1,50 @@
-﻿using NUnit.Framework;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
 using OpenQA.Selenium;
 using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 using Golden1.Automation.Pages;
-using System.Linq;
+using Golden1.Automation.Utilities;
 
 namespace Golden1.Automation.StepDefinitions
 {
+    /// <summary>
+    /// Step Definitions for Golden 1 Navigation Tests
+    /// Test Cases: TASK0020445 TS-001 through TS-012
+    /// </summary>
     [Binding]
     public class NavigationSteps
     {
         private readonly IWebDriver _driver;
-        private readonly NavigationPage _navigationPage;
+        private readonly HomePage _homePage;
+        private readonly ScenarioContext _scenarioContext;
 
-        public NavigationSteps(ScenarioContext context)
+        public NavigationSteps(IWebDriver driver, ScenarioContext scenarioContext)
         {
-            _driver = (IWebDriver)context["Driver"];
-            _navigationPage = new NavigationPage(_driver);
+            _driver = driver ?? throw new ArgumentNullException(nameof(driver));
+            _scenarioContext = scenarioContext ?? throw new ArgumentNullException(nameof(scenarioContext));
+            _homePage = new HomePage(_driver);
         }
 
-        [Given(@"User is on Golden1 homepage")]
-        public void GivenUserIsOnGolden1Homepage()
+        // =============================================================
+        // GIVEN STEPS - Preconditions
+        // =============================================================
+
+        /// <summary>
+        /// Step: Given the browser is launched
+        /// Test Cases: All test scenarios
+        /// </summary>
+        [Given(@"the browser is launched")]
+        public void GivenTheBrowserIsLaunched()
         {
-            _navigationPage.OpenHome();
+            LogHelper.Info("Browser is already launched via Hooks");
+            Assert.That(_driver, Is.Not.Null, "Driver should be initialized");
         }
 
-        [When(@"User navigates to ""(.*)"" under ""(.*)""")]
-        public void WhenUserNavigatesToUnder(string subMenu, string mainMenu)
-        {
-            _navigationPage.NavigateToSubMenu(mainMenu, subMenu);
-        }
-
-        [Then(@"User should be on ""(.*)"" page")]
-        public void ThenUserShouldBeOnPage(string urlPart)
-        {
-            Assert.That(_navigationPage.VerifyUrlContains(urlPart), Is.True);
-        }
-
-        // ✅ Global nav visibility
-        [Then(@"Navigation should be visible")]
-        public void ThenNavigationShouldBeVisible()
-        {
-            Assert.That(_navigationPage.IsTopNavigationVisible(), Is.True,
-                "Top navigation is not visible.");
-        }
-
-        // ✅ Top tab menu validation
-        [Then(@"The following menu options should be present in top navigation:")]
-        public void ThenTheFollowingMenuOptionsShouldBePresentInTopNavigation(Table table)
-        {
-            var expectedMenus = table.Rows.Select(r => r["Menu"]).ToList();
-
-            foreach (var menu in expectedMenus)
-            {
-                var locator = By.XPath($"//div[contains(@class,'menu__toptabs')]//a[normalize-space()='{menu}']");
-                Assert.That(_driver.FindElement(locator).Displayed,
-                    $"Menu option '{menu}' not visible in top navigation.");
-            }
-        }
-
-        // 🚀 FINAL STEP — Main menu validation (TC_NAV_010)
-        [Then(@"The main menu should display the following items:")]
-        public void ThenTheMainMenuShouldDisplayTheFollowingItems(Table table)
-        {
-            var expectedMenus = table.Rows.Select(r => r["Main Menu"]).ToList();
-            var actualMenus = _navigationPage.GetMainMenuItems();
-
-            foreach (var menu in expectedMenus)
-            {
-                Assert.That(actualMenus.Contains(menu),
-                    $"Main menu item '{menu}' was not found. Actual menus: {string.Join(", ", actualMenus)}");
-            }
-        }
-    }
-}
+        /// <summary>
+        /// Step: Given the browser type is "<Browser>"
+        /// Test Cases: TASK0020445 TS-010 TC-001
+        /// </summary>
+        [Given(@"the browser type is 
