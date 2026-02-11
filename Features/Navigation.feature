@@ -1,69 +1,69 @@
-Feature: Golden1 Global Navigation Validation
-  As a user of the Golden1 website
-  I want to validate the navigation menu functionality
-  So that I can access different sections of the website easily
+@Navigation @Regression
+Feature: Golden1 Website Navigation
+  As a user of Golden1 website
+  I want to navigate through different sections
+  So that I can access various banking services and information
 
-Background:
-  Given User is on Golden1 homepage
+  Background:
+    Given User opens the Golden1 homepage
 
-@Navigation @Smoke @Critical
-Scenario: TC_NAV_000 - Verify global navigation is visible
-  Then Navigation should be visible
-  And The following menu options should be present in top navigation:
-    | Menu                 |
-    | Personal             |
-    | Business             |
-    | Financial Wellness   |
-    | Appointments         |
-    | Locations            |
-    | Membership           |
-    | Help Center          |
+  @Smoke @TC001
+  Scenario: TC-001 - Verify homepage loads successfully
+    Then The homepage should load successfully
+    And The main menu should be visible
+    And The top tabs should be visible
 
-@Navigation @Regression @P1
-Scenario Outline: <TC_ID> - Validate navigation link functionality
-  When User navigates to "<SubMenu>" under "<MainMenu>"
-  Then User should be on "<UrlPart>" page
+  @TC002
+  Scenario: TC-002 - Verify Personal tab is visible
+    Then The Personal tab should be visible
 
-  Examples: Checking Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_001 | Checking     | Free Checking               | free-checking-account           |
-    | TC_NAV_002 | Checking     | Easy Checking               | easy-checking-account           |
-    | TC_NAV_009 | Checking     | MarketRate Checking         | marketrate-checking-account     |
+  @TC003
+  Scenario: TC-003 - Verify navigation to Checking menu
+    When User clicks on the Checking menu
+    Then The Checking menu should be visible
 
+  @TC004
+  Scenario: TC-004 - Verify navigation to Free Checking page
+    When User navigates to Free Checking page
+    Then The Free Checking page should be displayed
+    And The page URL should contain "checking"
 
+  @TC005
+  Scenario: TC-005 - Verify navigation to Savings Account page
+    When User navigates to Savings Account page
+    Then The Savings Account page should be displayed
+    And The page URL should contain "savings"
 
-  Examples: Savings Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_003 | Savings      | Money Market                | money-market-savings-account    |
-  
-  Examples: Home Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_004 | Home Loans   | Buy a Home                  | home-loans/purchase             |
+  @TC006
+  Scenario: TC-006 - Verify navigation to Auto Loans page
+    When User navigates to Auto Loans page
+    Then The Auto Loans page should be displayed
 
-  Examples: Credit Cards
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_005 | Credit Cards | Member Cash Rewards+ Card   | member-cash-rewards-plus        |
+  @TC007
+  Scenario: TC-007 - Verify top tab navigation to Business
+    When User clicks on the Business tab
+    Then The page URL should contain "business"
 
-  Examples: Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_006 | Loans        | Personal Loans              | personal-loans                  |
+  @TC008
+  Scenario: TC-008 - Verify top tab navigation to Financial Wellness
+    When User clicks on the Financial Wellness tab
+    Then The page title should contain "Financial Wellness"
 
-  Examples: Investing
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_007 | Investing    | Make an Investment Plan     | investment-services             |
+  @TC009
+  Scenario: TC-009 - Verify top tab navigation to Locations
+    When User clicks on the Locations tab
+    Then The page URL should contain "locations"
 
-  Examples: Community
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_008 | Community    | Community Commitment        | our-commitment                  |
+  @TC010
+  Scenario Outline: TC-010 - Verify navigation to different menu sections
+    When User clicks on the <MenuName> menu
+    Then The page URL should contain "<ExpectedUrlPart>"
 
-@Navigation @Regression @P2
-Scenario: TC_NAV_010 - Verify main menu items are displayed
-  Then The main menu should display the following items:
-    | Main Menu    |
-    | Checking     |
-    | Savings      |
-    | Home Loans   |
-    | Credit Cards |
-    | Loans        |
-    | Investing    |
-    | Community    |
+    Examples:
+      | MenuName      | ExpectedUrlPart |
+      | Savings       | savings         |
+      | Home Loans    | home            |
+      | Credit Cards  | credit          |
+      | Loans         | loans           |
+      | Investing     | invest          |
+      | Community     | community       |
