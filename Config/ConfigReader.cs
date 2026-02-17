@@ -4,38 +4,91 @@ using Microsoft.Extensions.Configuration;
 
 namespace Golden1.Automation.Config
 {
+    /// <summary>
+    /// Configuration reader for application settings
+    /// Reads from appsettings.json and environment-specific config files
+    /// </summary>
     public static class ConfigReader
     {
-        private static readonly IConfigurationRoot _config;
-        private static readonly string _environment;
+        private static IConfiguration _configuration;
 
         static ConfigReader()
         {
-            _environment = System.Environment.GetEnvironmentVariable("TEST_ENV") ?? "QA";
+            try
+            {
+                var environment = Environment.GetEnvironmentVariable("TEST_ENVIRONMENT") ?? "QA";
 
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"Config/appsettings.{_environment}.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-
-            _config = builder.Build();
+                _configuration = new ConfigurationBuilder()
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("Config/appsettings.json", optional: false, reloadOnChange: true)
+                    .AddJsonFile($"Config/appsettings.{environment}.json", optional: true, reloadOnChange: true)
+                    .AddEnvironmentVariables()
+                    .Build();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to load configuration: {ex.Message}", ex);
+            }
         }
 
-        public static string TestEnvironment => _environment;
-        public static string BaseUrl => _config["BaseUrl"] ?? throw new InvalidOperationException("BaseUrl not configured");
-        public static string Browser => _config["Browser"] ?? "Chrome";
-        public static bool Headless => bool.TryParse(_config["Headless"], out var v) && v;
-        public static int TimeoutSeconds => int.TryParse(_config["TimeoutSeconds"], out var v) ? v : 20;
-        public static int ImplicitWaitSeconds => int.TryParse(_config["ImplicitWaitSeconds"], out var v) ? v : 0;
-        public static int PageLoadTimeoutSeconds => int.TryParse(_config["PageLoadTimeoutSeconds"], out var v) ? v : 60;
+        /// <summary>
+        /// Gets the base URL for the application
+        /// </summary>
+        public static string BaseUrl => GetConfigValue("BaseUrl", "https://www.golden1.com/");
 
-        public static bool TakeScreenshotOnFailure => bool.TryParse(_config["TakeScreenshotOnFailure"], out var v) ? v : true;
-        public static string ScreenshotPath => _config["ScreenshotPath"] ?? "Screenshots";
-        public static string ReportPath => _config["ReportPath"] ?? "TestResults";
-        public static int MaxRetryCount => int.TryParse(_config["MaxRetryCount"], out var v) ? v : 0;
+        /// <summary>
+        /// Gets the browser type (chrome, firefox, edge)
+        /// </summary>
+        public static string Browser => GetConfigValue("Browser", "chrome");
 
-        public static bool UseRemoteDriver => bool.TryParse(_config["UseRemoteDriver"], out var v) && v;
-        public static string RemoteDriverUrl => _config["RemoteDriverUrl"] ?? "http://localhost:4444/wd/hub";
+        /// <summary>
+        /// Gets whether to run browser in headless mode
+        /// </summary>
+        public static bool Headless => bool.Parse(GetConfigValue("Headless", "false"));
+
+        /// <summary>
+        /// Gets the implicit wait timeout in seconds
+        /// </summary>
+        public static int ImplicitWait => int.Parse(GetConfigValue("ImplicitWait", "10"));
+
+        /// <summary>
+        /// Gets the explicit wait timeout in seconds
+        /// </summary>
+        public static int ExplicitWait => int.Parse(GetConfigValue("ExplicitWait", "30"));
+
+        /// <summary>
+        /// Gets the page load timeout in seconds
+        /// </summary>
+        public static int PageLoadTimeout => int.Parse(GetConfigValue("PageLoadTimeout", "60"));
+
+        /// <summary>
+        /// Gets the test environment (QA, UAT, Prod)
+        /// </summary>
+        public static string Environment => GetConfigValue("Environment", "QA");
+
+        /// <summary>
+        /// Gets the screenshot save path
+        /// </summary>
+        public static string ScreenshotPath => GetConfigValue("ScreenshotPath", "./Screenshots/");
+
+        /// <summary>
+        /// Gets the log file path
+        /// </summary>
+        public static string LogPath => GetConfigValue("LogPath", "./Logs/");
+
+        /// <summary>
+        /// Helper method to get configuration value with default fallback
+        /// </summary>
+        private static string GetConfigValue(string key, string defaultValue)
+        {
+            try
+            {
+                return _configuration[key] ?? defaultValue;
+            }
+            catch
+            {
+                return defaultValue;
+            }
+        }
     }
 }
