@@ -1,94 +1,311 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using OpenQA.Selenium;
 using Golden1.Automation.Config;
 using Golden1.Automation.Utilities;
 
 namespace Golden1.Automation.Pages
 {
+    /// <summary>
+    /// Page Object for Golden1 Website Navigation
+    /// Handles all interactions with main navigation menu and top tabs
+    /// </summary>
     public class NavigationPage : BasePage
     {
+        // =============================================================
+        // CONSTRUCTOR
+        // =============================================================
         public NavigationPage(IWebDriver driver) : base(driver) { }
 
+        // =============================================================
+        // LOCATORS - Navigation Elements
+        // =============================================================
+        
+        // Menu Container
         private By MenuContainer => By.CssSelector("nav.menu");
         private By TopTabsContainer => By.CssSelector(".menu__toptabs");
 
+        // Top Navigation Tabs
+        private By PersonalTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Personal']");
+        private By BusinessTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Business']");
+        private By FinancialWellnessTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Financial Wellness']");
+        private By AppointmentsTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Appointments']");
+        private By LocationsTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Locations']");
+        private By MembershipTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Membership']");
+        private By HelpCenterTab => By.XPath("//div[contains(@class,'menu__toptabs')]//a[normalize-space()='Help Center']");
+
+        // Main Menu Options
+        private By CheckingMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Checking']");
+        private By SavingsMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Savings']");
+        private By HomeLoansMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Home Loans']");
+        private By CreditCardsMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Credit Cards']");
+        private By LoansMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Loans']");
+        private By InvestingMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Investing']");
+        private By CommunityMenu => By.XPath("//a[contains(@class,'nav-item-link') and normalize-space()='Community']");
+
+        // Submenu Links
+        private By FreeCheckingLink => By.XPath("//a[normalize-space()='Free Checking']");
+        private By SavingsAccountLink => By.XPath("//a[normalize-space()='Savings Account']");
+        private By AutoLoansLink => By.XPath("//a[contains(normalize-space(),'Auto Loan')]");
+
+        // Cookie Banner
         private By CookieBanner => By.Id("onetrust-banner-sdk");
         private By AcceptCookiesButton => By.Id("onetrust-accept-btn-handler");
 
-        public void OpenHome()
+        // =============================================================
+        // NAVIGATION METHODS
+        // =============================================================
+
+        /// <summary>
+        /// Opens the Golden1 homepage
+        /// </summary>
+        public void OpenHomePage()
         {
-            LogHelper.Info($"Opening Golden1 homepage: {ConfigReader.BaseUrl}");
+            LogHelper.Info("Opening Golden1 homepage");
             NavigateTo(ConfigReader.BaseUrl);
-            HandleCookieBanner();
+            WaitForPageLoad();
+            LogHelper.Info($"Homepage opened successfully: {ConfigReader.BaseUrl}");
         }
 
-        private void HandleCookieBanner()
+        /// <summary>
+        /// Handles cookie consent banner if displayed
+        /// </summary>
+        public void AcceptCookiesIfDisplayed()
         {
             try
             {
-                if (IsDisplayed(CookieBanner, 5))
+                LogHelper.Info("Checking for cookie consent banner");
+                if (WaitHelper.WaitVisible(Driver, CookieBanner, 5))
                 {
+                    LogHelper.Info("Cookie banner is displayed, accepting cookies");
+                    WaitHelper.WaitClickable(Driver, AcceptCookiesButton, 5);
                     Click(AcceptCookiesButton);
-                    System.Threading.Thread.Sleep(1000);
+                    LogHelper.Info("Cookies accepted successfully");
+                    WaitHelper.WaitInvisible(Driver, CookieBanner, 5);
+                }
+                else
+                {
+                    LogHelper.Info("Cookie banner not displayed");
                 }
             }
-            catch { }
+            catch (Exception ex)
+            {
+                LogHelper.Warning($"Cookie banner handling: {ex.Message}");
+            }
         }
 
-        public bool IsTopNavigationVisible() =>
-            IsDisplayed(MenuContainer) && IsDisplayed(TopTabsContainer);
+        // =============================================================
+        // TOP TAB NAVIGATION METHODS
+        // =============================================================
 
-        // 🔥 FINAL NAVIGATION FLOW (page-based navigation, not hover)
-        public void NavigateToSubMenu(string mainMenu, string subMenu)
+        /// <summary>
+        /// Clicks on a top navigation tab by name
+        /// </summary>
+        /// <param name="tabName">Name of the tab (Personal, Business, etc.)</param>
+        public void ClickTopTab(string tabName)
         {
-            LogHelper.Info($"Navigating to main menu page: {mainMenu}");
+            LogHelper.Info($"Clicking on top tab: {tabName}");
+            By tabLocator = GetTopTabLocator(tabName);
+            WaitHelper.WaitVisible(Driver, tabLocator, 10);
+            WaitHelper.WaitClickable(Driver, tabLocator, 10);
+            Click(tabLocator);
+            LogHelper.Info($"Successfully clicked on {tabName} tab");
+        }
 
-            var mainLocator = By.XPath($"//a[contains(@class,'nav-item-link') and normalize-space()='{mainMenu}']");
-            WaitHelper.WaitVisible(Driver, mainLocator, 10);
-            Click(mainLocator);
+        /// <summary>
+        /// Gets the locator for a specific top tab
+        /// </summary>
+        private By GetTopTabLocator(string tabName)
+        {
+            return tabName.ToLower() switch
+            {
+                "personal" => PersonalTab,
+                "business" => BusinessTab,
+                "financial wellness" => FinancialWellnessTab,
+                "appointments" => AppointmentsTab,
+                "locations" => LocationsTab,
+                "membership" => MembershipTab,
+                "help center" => HelpCenterTab,
+                _ => throw new ArgumentException($"Unknown tab name: {tabName}")
+            };
+        }
 
-            WaitForPageLoad();
+        // =============================================================
+        // MAIN MENU NAVIGATION METHODS
+        // =============================================================
 
-            LogHelper.Info($"Selecting page link: {subMenu}");
-
-            var subLocator = By.XPath($"//a[normalize-space()='{subMenu}']");
-            WaitHelper.WaitVisible(Driver, subLocator, 15);
-            Click(subLocator);
-
+        /// <summary>
+        /// Clicks on a main menu option by name
+        /// </summary>
+        /// <param name="menuName">Name of the menu (Checking, Savings, etc.)</param>
+        public void ClickMainMenu(string menuName)
+        {
+            LogHelper.Info($"Clicking on main menu: {menuName}");
+            By menuLocator = GetMainMenuLocator(menuName);
+            WaitHelper.WaitVisible(Driver, menuLocator, 10);
+            WaitHelper.WaitClickable(Driver, menuLocator, 10);
+            Click(menuLocator);
+            LogHelper.Info($"Successfully clicked on {menuName} menu");
             WaitForPageLoad();
         }
 
-        public bool VerifyUrlContains(string expectedUrlPart)
+        /// <summary>
+        /// Gets the locator for a specific main menu
+        /// </summary>
+        private By GetMainMenuLocator(string menuName)
         {
-            var currentUrl = GetCurrentUrl();
-            bool contains = currentUrl.Contains(expectedUrlPart);
+            return menuName.ToLower() switch
+            {
+                "checking" => CheckingMenu,
+                "savings" => SavingsMenu,
+                "home loans" => HomeLoansMenu,
+                "credit cards" => CreditCardsMenu,
+                "loans" => LoansMenu,
+                "investing" => InvestingMenu,
+                "community" => CommunityMenu,
+                _ => throw new ArgumentException($"Unknown menu name: {menuName}")
+            };
+        }
 
-            if (contains)
-                LogHelper.Info($"URL contains expected value: {expectedUrlPart}");
-            else
-                LogHelper.Error($"URL mismatch. Expected: {expectedUrlPart}, Actual: {currentUrl}");
+        // =============================================================
+        // SUBMENU NAVIGATION METHODS
+        // =============================================================
 
+        /// <summary>
+        /// Clicks on a submenu link by name
+        /// </summary>
+        /// <param name="linkName">Name of the link</param>
+        public void ClickSubmenuLink(string linkName)
+        {
+            LogHelper.Info($"Clicking on submenu link: {linkName}");
+            By linkLocator = GetSubmenuLinkLocator(linkName);
+            WaitHelper.WaitVisible(Driver, linkLocator, 10);
+            WaitHelper.WaitClickable(Driver, linkLocator, 10);
+            Click(linkLocator);
+            LogHelper.Info($"Successfully clicked on {linkName} link");
+            WaitForPageLoad();
+        }
+
+        /// <summary>
+        /// Gets the locator for a specific submenu link
+        /// </summary>
+        private By GetSubmenuLinkLocator(string linkName)
+        {
+            return linkName.ToLower() switch
+            {
+                "free checking" => FreeCheckingLink,
+                "savings account" => SavingsAccountLink,
+                "auto loan" => AutoLoansLink,
+                _ => throw new ArgumentException($"Unknown link name: {linkName}")
+            };
+        }
+
+        // =============================================================
+        // VERIFICATION METHODS
+        // =============================================================
+
+        /// <summary>
+        /// Verifies if menu container is visible
+        /// </summary>
+        public bool IsMenuContainerVisible()
+        {
+            try
+            {
+                LogHelper.Info("Checking if menu container is visible");
+                WaitHelper.WaitVisible(Driver, MenuContainer, 10);
+                bool isVisible = IsDisplayed(MenuContainer);
+                LogHelper.Info($"Menu container visible: {isVisible}");
+                return isVisible;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"Menu container not visible: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifies if a specific top tab is visible
+        /// </summary>
+        public bool IsTopTabVisible(string tabName)
+        {
+            try
+            {
+                LogHelper.Info($"Checking if {tabName} tab is visible");
+                By tabLocator = GetTopTabLocator(tabName);
+                WaitHelper.WaitVisible(Driver, tabLocator, 10);
+                bool isVisible = IsDisplayed(tabLocator);
+                LogHelper.Info($"{tabName} tab visible: {isVisible}");
+                return isVisible;
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error($"{tabName} tab not visible: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Verifies if all specified tabs are visible
+        /// </summary>
+        public bool AreAllTabsVisible(List<string> tabNames)
+        {
+            LogHelper.Info($"Verifying visibility of {tabNames.Count} tabs");
+            bool allVisible = true;
+            
+            foreach (string tabName in tabNames)
+            {
+                if (!IsTopTabVisible(tabName))
+                {
+                    allVisible = false;
+                    LogHelper.Error($"Tab not visible: {tabName}");
+                }
+            }
+            
+            LogHelper.Info($"All tabs visible: {allVisible}");
+            return allVisible;
+        }
+
+        /// <summary>
+        /// Gets the current page URL
+        /// </summary>
+        public string GetPageUrl()
+        {
+            string url = GetCurrentUrl();
+            LogHelper.Info($"Current page URL: {url}");
+            return url;
+        }
+
+        /// <summary>
+        /// Gets the current page title
+        /// </summary>
+        public string GetPageTitle()
+        {
+            string title = Driver.Title;
+            LogHelper.Info($"Current page title: {title}");
+            return title;
+        }
+
+        /// <summary>
+        /// Verifies if URL contains expected text
+        /// </summary>
+        public bool DoesUrlContain(string expectedText)
+        {
+            string currentUrl = GetPageUrl();
+            bool contains = currentUrl.ToLower().Contains(expectedText.ToLower());
+            LogHelper.Info($"URL contains '{expectedText}': {contains}");
             return contains;
         }
 
-        // ✅ ADD THIS METHOD (required by your Step file)
-        public List<string> GetMainMenuItems()
+        /// <summary>
+        /// Verifies if page title contains expected text
+        /// </summary>
+        public bool DoesTitleContain(string expectedText)
         {
-            LogHelper.Info("Reading main menu items from navigation");
-
-            var menuElements = Driver.FindElements(By.XPath("//a[contains(@class,'nav-item-link')]"));
-
-            var menus = menuElements
-                .Where(e => e.Displayed && !string.IsNullOrWhiteSpace(e.Text))
-                .Select(e => e.Text.Trim())
-                .Distinct()
-                .ToList();
-
-            LogHelper.Info($"Main menus detected: {string.Join(", ", menus)}");
-
-            return menus;
+            string currentTitle = GetPageTitle();
+            bool contains = currentTitle.ToLower().Contains(expectedText.ToLower());
+            LogHelper.Info($"Title contains '{expectedText}': {contains}");
+            return contains;
         }
     }
 }
