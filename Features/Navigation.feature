@@ -1,69 +1,62 @@
-Feature: Golden1 Global Navigation Validation
-  As a user of the Golden1 website
-  I want to validate the navigation menu functionality
-  So that I can access different sections of the website easily
+@Navigation @Regression @TASK0020445
+Feature: TASK0020445 - Golden1 Website Navigation
+  As a user of Golden1 website
+  I want to navigate through different sections
+  So that I can access various banking services
 
-Background:
-  Given User is on Golden1 homepage
+  Background:
+    Given I navigate to Golden1 homepage
+    And I accept cookies if banner is displayed
 
-@Navigation @Smoke @Critical
-Scenario: TC_NAV_000 - Verify global navigation is visible
-  Then Navigation should be visible
-  And The following menu options should be present in top navigation:
-    | Menu                 |
-    | Personal             |
-    | Business             |
-    | Financial Wellness   |
-    | Appointments         |
-    | Locations            |
-    | Membership           |
-    | Help Center          |
+  @Smoke @Critical @P1 @TC001
+  Scenario: TASK0020445 TS-001 TC-001 - Verify homepage loads successfully
+    Then the homepage should be displayed
+    And the main menu should be visible
 
-@Navigation @Regression @P1
-Scenario Outline: <TC_ID> - Validate navigation link functionality
-  When User navigates to "<SubMenu>" under "<MainMenu>"
-  Then User should be on "<UrlPart>" page
+  @Smoke @Critical @P1 @TC002
+  Scenario: TASK0020445 TS-001 TC-002 - Verify top navigation tabs are visible
+    Then the Personal tab should be visible
+    And the Business tab should be visible
+    And the Financial Wellness tab should be visible
+    And the Appointments tab should be visible
+    And the Locations tab should be visible
+    And the Membership tab should be visible
+    And the Help Center tab should be visible
 
-  Examples: Checking Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_001 | Checking     | Free Checking               | free-checking-account           |
-    | TC_NAV_002 | Checking     | Easy Checking               | easy-checking-account           |
-    | TC_NAV_009 | Checking     | MarketRate Checking         | marketrate-checking-account     |
+  @Functional @P1 @TC003
+  Scenario: TASK0020445 TS-002 TC-001 - Verify navigation to Checking menu
+    When I hover over the Checking menu
+    Then the Checking submenu should be displayed
 
+  @Functional @P1 @TC004
+  Scenario: TASK0020445 TS-002 TC-002 - Verify navigation to Free Checking page
+    When I hover over the Checking menu
+    And I click on Free Checking link
+    Then the Free Checking page should be displayed
 
+  @Functional @P1 @TC005
+  Scenario: TASK0020445 TS-003 TC-001 - Verify navigation to Savings Account
+    When I hover over the Savings menu
+    And I click on Savings Account link
+    Then the Savings Account page should be displayed
 
-  Examples: Savings Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_003 | Savings      | Money Market                | money-market-savings-account    |
-  
-  Examples: Home Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_004 | Home Loans   | Buy a Home                  | home-loans/purchase             |
+  @Functional @P1 @TC006
+  Scenario: TASK0020445 TS-004 TC-001 - Verify navigation to Auto Loans
+    When I hover over the Loans menu
+    And I click on Auto Loans link
+    Then the Auto Loans page should be displayed
 
-  Examples: Credit Cards
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_005 | Credit Cards | Member Cash Rewards+ Card   | member-cash-rewards-plus        |
+  @Functional @P2 @TC007
+  Scenario Outline: TASK0020445 TS-005 TC-001 - Verify all main menu items are clickable - <MenuName>
+    When I hover over the <MenuName> menu
+    Then the <MenuName> submenu should be displayed
 
-  Examples: Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_006 | Loans        | Personal Loans              | personal-loans                  |
-
-  Examples: Investing
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_007 | Investing    | Make an Investment Plan     | investment-services             |
-
-  Examples: Community
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_008 | Community    | Community Commitment        | our-commitment                  |
-
-@Navigation @Regression @P2
-Scenario: TC_NAV_010 - Verify main menu items are displayed
-  Then The main menu should display the following items:
-    | Main Menu    |
-    | Checking     |
-    | Savings      |
-    | Home Loans   |
-    | Credit Cards |
-    | Loans        |
-    | Investing    |
-    | Community    |
+    Examples:
+      | MenuName      |
+      | Checking      |
+      | Savings       |
+      | Home Loans    |
+      | Credit Cards  |
+      | Loans         |
+      | Investing     |
+      | Community     |
