@@ -1,75 +1,166 @@
-﻿using NUnit.Framework;
-using OpenQA.Selenium;
-using TechTalk.SpecFlow;
+using System;
+using System.Collections.Generic;
+using NUnit.Framework;
 using Golden1.Automation.Pages;
-using System.Linq;
+using Golden1.Automation.Utilities;
+using TechTalk.SpecFlow;
+using TechTalk.SpecFlow.Assist;
 
 namespace Golden1.Automation.StepDefinitions
 {
     [Binding]
     public class NavigationSteps
     {
-        private readonly IWebDriver _driver;
         private readonly NavigationPage _navigationPage;
+        private readonly OverlayPage _overlayPage;
 
-        public NavigationSteps(ScenarioContext context)
+        // CONSTRUCTOR INJECTION
+        public NavigationSteps(NavigationPage navigationPage, OverlayPage overlayPage)
         {
-            _driver = (IWebDriver)context["Driver"];
-            _navigationPage = new NavigationPage(_driver);
+            _navigationPage = navigationPage;
+            _overlayPage = overlayPage;
         }
 
-        [Given(@"User is on Golden1 homepage")]
+        // GIVEN STEPS - Setup/Preconditions
+        [Given(@"the user is on the Golden1 homepage")]
         public void GivenUserIsOnGolden1Homepage()
         {
-            _navigationPage.OpenHome();
-        }
-
-        [When(@"User navigates to ""(.*)"" under ""(.*)""")]
-        public void WhenUserNavigatesToUnder(string subMenu, string mainMenu)
-        {
-            _navigationPage.NavigateToSubMenu(mainMenu, subMenu);
-        }
-
-        [Then(@"User should be on ""(.*)"" page")]
-        public void ThenUserShouldBeOnPage(string urlPart)
-        {
-            Assert.That(_navigationPage.VerifyUrlContains(urlPart), Is.True);
-        }
-
-        // ✅ Global nav visibility
-        [Then(@"Navigation should be visible")]
-        public void ThenNavigationShouldBeVisible()
-        {
-            Assert.That(_navigationPage.IsTopNavigationVisible(), Is.True,
-                "Top navigation is not visible.");
-        }
-
-        // ✅ Top tab menu validation
-        [Then(@"The following menu options should be present in top navigation:")]
-        public void ThenTheFollowingMenuOptionsShouldBePresentInTopNavigation(Table table)
-        {
-            var expectedMenus = table.Rows.Select(r => r["Menu"]).ToList();
-
-            foreach (var menu in expectedMenus)
+            LogHelper.Info("Step: Given the user is on the Golden1 homepage");
+            _navigationPage.OpenHomePage();
+            
+            // Handle cookie banner if present
+            if (_overlayPage.IsCookieBannerDisplayed())
             {
-                var locator = By.XPath($"//div[contains(@class,'menu__toptabs')]//a[normalize-space()='{menu}']");
-                Assert.That(_driver.FindElement(locator).Displayed,
-                    $"Menu option '{menu}' not visible in top navigation.");
+                _overlayPage.AcceptCookies();
             }
         }
 
-        // 🚀 FINAL STEP — Main menu validation (TC_NAV_010)
-        [Then(@"The main menu should display the following items:")]
-        public void ThenTheMainMenuShouldDisplayTheFollowingItems(Table table)
+        [Given(@"the cookie banner is displayed")]
+        public void GivenCookieBannerIsDisplayed()
         {
-            var expectedMenus = table.Rows.Select(r => r["Main Menu"]).ToList();
-            var actualMenus = _navigationPage.GetMainMenuItems();
+            LogHelper.Info("Step: Given the cookie banner is displayed");
+            bool isDisplayed = _overlayPage.IsCookieBannerDisplayed();
+            Assert.IsTrue(isDisplayed, "Cookie banner should be displayed");
+        }
 
-            foreach (var menu in expectedMenus)
+        // WHEN STEPS - Actions
+        [When(@"the user opens the Golden1 application")]
+        public void WhenUserOpensGolden1Application()
+        {
+            LogHelper.Info("Step: When the user opens the Golden1 application");
+            _navigationPage.OpenHomePage();
+        }
+
+        [When(@"the user clicks on the ""(.*?)"" menu option")]
+        public void WhenUserClicksOnMenuOption(string menuOption)
+        {
+            LogHelper.Info($"Step: When the user clicks on the '{menuOption}' menu option");
+            _navigationPage.ClickMenuOption(menuOption);
+        }
+
+        [When(@"the user clicks on the ""(.*?)"" link")]
+        public void WhenUserClicksOnLink(string linkName)
+        {
+            LogHelper.Info($"Step: When the user clicks on the '{linkName}' link");
+            _navigationPage.ClickSubMenuLink(linkName);
+        }
+
+        [When(@"the user clicks on the ""(.*?)"" top tab")]
+        public void WhenUserClicksOnTopTab(string tabName)
+        {
+            LogHelper.Info($"Step: When the user clicks on the '{tabName}' top tab");
+            _navigationPage.ClickTopTab(tabName);
+        }
+
+        [When(@"the user accepts cookies")]
+        public void WhenUserAcceptsCookies()
+        {
+            LogHelper.Info("Step: When the user accepts cookies");
+            _overlayPage.AcceptCookies();
+        }
+
+        // THEN STEPS - Assertions
+        [Then(@"the homepage should be displayed")]
+        public void ThenHomepageShouldBeDisplayed()
+        {
+            LogHelper.Info("Step: Then the homepage should be displayed");
+            bool isDisplayed = _navigationPage.IsPageDisplayed("Home");
+            Assert.IsTrue(isDisplayed, "Homepage should be displayed");
+            LogHelper.Info("Homepage verified as displayed");
+        }
+
+        [Then(@"the main menu container should be visible")]
+        public void ThenMainMenuContainerShouldBeVisible()
+        {
+            LogHelper.Info("Step: Then the main menu container should be visible");
+            bool isVisible = _navigationPage.IsMenuContainerVisible();
+            Assert.IsTrue(isVisible, "Main menu container should be visible");
+            LogHelper.Info("Main menu container verified as visible");
+        }
+
+        [Then(@"the following top navigation tabs should be visible")]
+        public void ThenFollowingTopNavigationTabsShouldBeVisible(Table table)
+        {
+            LogHelper.Info("Step: Then the following top navigation tabs should be visible");
+            var tabs = table.CreateSet<TabData>();
+            
+            foreach (var tab in tabs)
             {
-                Assert.That(actualMenus.Contains(menu),
-                    $"Main menu item '{menu}' was not found. Actual menus: {string.Join(", ", actualMenus)}");
+                bool isVisible = _navigationPage.IsTopTabVisible(tab.TabName);
+                Assert.IsTrue(isVisible, $"Top navigation tab '{tab.TabName}' should be visible");
+                LogHelper.Info($"Top tab '{tab.TabName}' verified as visible");
             }
+        }
+
+        [Then(@"the ""(.*?)"" section should be displayed")]
+        public void ThenSectionShouldBeDisplayed(string sectionName)
+        {
+            LogHelper.Info($"Step: Then the '{sectionName}' section should be displayed");
+            bool isDisplayed = _navigationPage.IsPageDisplayed(sectionName);
+            Assert.IsTrue(isDisplayed, $"The '{sectionName}' section should be displayed");
+            LogHelper.Info($"Section '{sectionName}' verified as displayed");
+        }
+
+        [Then(@"the Free Checking page should be displayed")]
+        public void ThenFreeCheckingPageShouldBeDisplayed()
+        {
+            LogHelper.Info("Step: Then the Free Checking page should be displayed");
+            bool isDisplayed = _navigationPage.IsPageDisplayed("Free Checking");
+            Assert.IsTrue(isDisplayed, "Free Checking page should be displayed");
+            LogHelper.Info("Free Checking page verified as displayed");
+        }
+
+        [Then(@"the Savings Account page should be displayed")]
+        public void ThenSavingsAccountPageShouldBeDisplayed()
+        {
+            LogHelper.Info("Step: Then the Savings Account page should be displayed");
+            bool isDisplayed = _navigationPage.IsPageDisplayed("Savings Account");
+            Assert.IsTrue(isDisplayed, "Savings Account page should be displayed");
+            LogHelper.Info("Savings Account page verified as displayed");
+        }
+
+        [Then(@"the Auto Loans page should be displayed")]
+        public void ThenAutoLoansPageShouldBeDisplayed()
+        {
+            LogHelper.Info("Step: Then the Auto Loans page should be displayed");
+            bool isDisplayed = _navigationPage.IsPageDisplayed("Auto Loans");
+            Assert.IsTrue(isDisplayed, "Auto Loans page should be displayed");
+            LogHelper.Info("Auto Loans page verified as displayed");
+        }
+
+        [Then(@"the cookie banner should not be visible")]
+        public void ThenCookieBannerShouldNotBeVisible()
+        {
+            LogHelper.Info("Step: Then the cookie banner should not be visible");
+            bool isNotVisible = _overlayPage.IsCookieBannerNotVisible();
+            Assert.IsTrue(isNotVisible, "Cookie banner should not be visible");
+            LogHelper.Info("Cookie banner verified as not visible");
+        }
+
+        // HELPER CLASS FOR TABLE DATA
+        private class TabData
+        {
+            public string TabName { get; set; }
         }
     }
 }
