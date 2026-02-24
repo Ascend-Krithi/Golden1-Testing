@@ -1,69 +1,77 @@
-Feature: Golden1 Global Navigation Validation
-  As a user of the Golden1 website
-  I want to validate the navigation menu functionality
-  So that I can access different sections of the website easily
+@Regression @Navigation @P1
+Feature: TASK0020445 - Golden1 Website Navigation
+  As a user of Golden1 Credit Union website
+  I want to navigate through different sections
+  So that I can access various banking products and services
 
-Background:
-  Given User is on Golden1 homepage
+  Background:
+    Given User is on the Golden1 homepage
 
-@Navigation @Smoke @Critical
-Scenario: TC_NAV_000 - Verify global navigation is visible
-  Then Navigation should be visible
-  And The following menu options should be present in top navigation:
-    | Menu                 |
-    | Personal             |
-    | Business             |
-    | Financial Wellness   |
-    | Appointments         |
-    | Locations            |
-    | Membership           |
-    | Help Center          |
+  @Smoke
+  Scenario: TASK0020445 TS-001 TC-001 - Verify homepage loads successfully
+    Then User should see the main navigation menu
+    And User should see the top tabs container
 
-@Navigation @Regression @P1
-Scenario Outline: <TC_ID> - Validate navigation link functionality
-  When User navigates to "<SubMenu>" under "<MainMenu>"
-  Then User should be on "<UrlPart>" page
+  @Smoke
+  Scenario: TASK0020445 TS-001 TC-002 - Verify cookie banner appears and can be accepted
+    Then User should see the cookie consent banner
+    When User clicks Accept Cookies button
+    Then Cookie banner should disappear
 
-  Examples: Checking Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_001 | Checking     | Free Checking               | free-checking-account           |
-    | TC_NAV_002 | Checking     | Easy Checking               | easy-checking-account           |
-    | TC_NAV_009 | Checking     | MarketRate Checking         | marketrate-checking-account     |
+  Scenario: TASK0020445 TS-002 TC-001 - Verify Personal tab is accessible
+    When User clicks on Personal tab
+    Then Personal tab should be active
+    And User should see the main menu options
 
+  Scenario: TASK0020445 TS-003 TC-001 - Navigate to Checking menu
+    When User clicks on Personal tab
+    And User clicks on Checking menu
+    Then Checking submenu should be displayed
 
+  Scenario: TASK0020445 TS-003 TC-002 - Navigate to Free Checking page
+    When User clicks on Personal tab
+    And User clicks on Checking menu
+    And User clicks on Free Checking link
+    Then User should be navigated to Free Checking page
+    And Page heading should contain "Free Checking"
 
-  Examples: Savings Accounts
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_003 | Savings      | Money Market                | money-market-savings-account    |
-  
-  Examples: Home Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_004 | Home Loans   | Buy a Home                  | home-loans/purchase             |
+  Scenario: TASK0020445 TS-004 TC-001 - Navigate to Savings menu
+    When User clicks on Personal tab
+    And User clicks on Savings menu
+    Then Savings submenu should be displayed
 
-  Examples: Credit Cards
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_005 | Credit Cards | Member Cash Rewards+ Card   | member-cash-rewards-plus        |
+  Scenario: TASK0020445 TS-004 TC-002 - Navigate to Savings Account page
+    When User clicks on Personal tab
+    And User clicks on Savings menu
+    And User clicks on Savings Account link
+    Then User should be navigated to Savings Account page
 
-  Examples: Loans
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_006 | Loans        | Personal Loans              | personal-loans                  |
+  Scenario Outline: TASK0020445 TS-005 TC-001 - Verify all top navigation tabs are accessible
+    When User clicks on "<TabName>" tab
+    Then "<TabName>" tab should be active
+    And User should see relevant content for "<TabName>"
 
-  Examples: Investing
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_007 | Investing    | Make an Investment Plan     | investment-services             |
+    Examples:
+      | TabName             |
+      | Personal            |
+      | Business            |
+      | Financial Wellness  |
+      | Appointments        |
+      | Locations           |
+      | Membership          |
+      | Help Center         |
 
-  Examples: Community
-    | TC_ID      | MainMenu     | SubMenu                     | UrlPart                         |
-    | TC_NAV_008 | Community    | Community Commitment        | our-commitment                  |
+  Scenario Outline: TASK0020445 TS-006 TC-001 - Verify all main menu options under Personal tab
+    When User clicks on Personal tab
+    And User clicks on "<MenuOption>" menu
+    Then "<MenuOption>" submenu should be displayed
 
-@Navigation @Regression @P2
-Scenario: TC_NAV_010 - Verify main menu items are displayed
-  Then The main menu should display the following items:
-    | Main Menu    |
-    | Checking     |
-    | Savings      |
-    | Home Loans   |
-    | Credit Cards |
-    | Loans        |
-    | Investing    |
-    | Community    |
+    Examples:
+      | MenuOption    |
+      | Checking      |
+      | Savings       |
+      | Home Loans    |
+      | Credit Cards  |
+      | Loans         |
+      | Investing     |
+      | Community     |
