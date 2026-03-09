@@ -1,0 +1,259 @@
+High-Level Design Document
+
+1. Introduction
+This document describes the high-level architecture, component design, data flows, integration, deployment, and non-functional requirements for the Youth Account Management capability, enabling parents/guardians to allocate and manage funds for youth accounts. All architectural decisions are mapped to ADRs retrieved from Jira issue SCIB-25 and its linked tasks.
+
+2. System Overview
+The Youth Account Management system allows parents to:
+- Access youth account dashboard (balance, activity)
+- Allocate funds to youth accounts
+- Set weekly spending limits
+- View youth spending activity
+- Handle errors (insufficient funds)
+
+3. Architecture Overview
+The solution is based on a microservices architecture, exposing REST APIs for all parent-youth account interactions. Security is enforced via OAuth and RBAC. All major services are containerized and deployed to a cloud-native platform.
+
+Mermaid Diagrams (C4 Notation):
+
+Context Diagram:
+```mermaid
+C4Context
+Person(parent, "Parent/Guardian", "Uses banking web/mobile app")
+Person(youth, "Youth", "Has youth account")
+System(bankingApp, "Banking Application", "Web/mobile interface")
+System_Ext(accountService, "Account Service", "Core account management")
+System_Ext(paymentService, "Payment Service", "Internal payments/transfer")
+System(youthAccountAPI, "Youth Account API", "Manages youth accounts")
+parent -> bankingApp: Uses
+bankingApp -> youthAccountAPI: Calls APIs
+youthAccountAPI -> accountService: Fetches account data
+youthAccountAPI -> paymentService: Initiates transfers
+```
+
+Container Diagram:
+```mermaid
+C4Container
+System(bankingApp, "Banking Application")
+Container(youthAccountAPI, "Youth Account API", "Spring Boot REST API", "Handles dashboard, transfers, limits, transactions")
+Container(accountService, "Account Service", "Java service", "Manages accounts")
+Container(paymentService, "Payment Service", "Java service", "Handles fund transfers")
+Container(transactionService, "Transaction Service", "Java service", "Records transactions")
+Container(database, "Youth Account DB", "PostgreSQL", "Stores youth account settings, limits")
+bankingApp -> youthAccountAPI: HTTPS/REST
+youthAccountAPI -> accountService: REST
+youthAccountAPI -> paymentService: REST
+youthAccountAPI -> transactionService: REST
+```
+
+Deployment Diagram:
+```mermaid
+C4Deployment
+Node(cloud, "Cloud Platform")
+Node(webServer, "Web Server")
+Node(appServer, "App Server")
+Node(dbServer, "Database Server")
+Container(youthAccountAPI)
+Container(accountService)
+Container(paymentService)
+Container(transactionService)
+Container(database)
+webServer -> appServer: HTTPS
+appServer -> dbServer: JDBC
+appServer -> cloud: OAuth
+```
+
+Data Model Diagram:
+```mermaid
+classDiagram
+class YouthAccount {
+  youthAccountId: string
+  accountBalance: decimal
+  spendingLimit: decimal
+  currency: string
+}
+class Transaction {
+  transactionId: string
+  date: datetime
+  description: string
+  amount: decimal
+  merchant: string
+  transactionType: debit | credit
+}
+class YouthAccountSettings {
+  youthAccountId: string
+  weeklySpendingLimit: decimal
+  updatedTimestamp: datetime
+}
+YouthAccount "1" -- "*" Transaction
+YouthAccount "1" -- "1" YouthAccountSettings
+```
+
+4. Component Design
+- Youth Account API: Implements dashboard retrieval, fund transfer, spending limit config, transaction history (SCIB-26, SCIB-27, SCIB-28, SCIB-29).
+- Account Service: Provides account data (SCIB-26, SCIB-27).
+- Payment Service: Handles transfers (SCIB-27).
+- Transaction Service: Provides transaction history (SCIB-26, SCIB-29).
+- Youth Account DB: Stores settings, spending limits (SCIB-28).
+
+Mapping to ADRs:
+| Component | ADR | Capability |
+|-----------|-----|-----------|
+| Youth Account API | SCIB-26, SCIB-27, SCIB-28, SCIB-29 | Dashboard, transfer, limits, history |
+| Account Service | SCIB-26, SCIB-27 | Account data |
+| Payment Service | SCIB-27 | Fund transfer |
+| Transaction Service | SCIB-26, SCIB-29 | Transaction history |
+| Youth Account DB | SCIB-28 | Spending limit config |
+
+5. Data Design
+- YouthAccount: youthAccountId, accountBalance, spendingLimit, currency
+- Transaction: transactionId, date, description, amount, merchant, transactionType
+- YouthAccountSettings: youthAccountId, weeklySpendingLimit, updatedTimestamp
+
+6. Interface Design
+REST APIs with JSON payloads. All endpoints require OAuth token and RBAC enforcement. Detailed in API Contract Outline.
+
+7. Non-Functional Aspects
+- Security: OAuth, RBAC, input validation, audit logging
+- Compliance: GDPR, PCI-DSS, ISO 27001, data minimization, parental consent
+- Performance: API response <500ms under normal load
+- Scalability: Horizontal scaling, stateless APIs
+- Availability: 99.99% uptime, HA cloud deployment
+- Reliability: Automatic failover, retry logic
+- Maintainability: Modular microservices, clear documentation
+- Auditability: All actions logged
+- Disaster Recovery: RTO <4hr, RPO <1hr, geo-redundant backups
+- Backup: Daily encrypted backups
+- Monitoring: Real-time metrics, alerting
+- Logging: Centralized log aggregation
+- RBAC: Role-based access enforced
+
+8. Integration
+- Account Service: REST integration
+- Payment Service: REST integration
+- Transaction Service: REST integration
+- Internal DB: JDBC access
+
+9. Deployment
+- Containerized microservices deployed to cloud
+- CI/CD pipeline for automated deployment
+- Encrypted secrets management
+
+10. Test Strategy
+- API contract testing (OpenAPI/Swagger)
+- Integration tests for service interactions
+- Security tests (auth, RBAC, input validation)
+- Performance tests (<500ms response)
+- Compliance tests (GDPR, PCI-DSS)
+
+11. Cross-Cutting Concerns
+- Input validation, output filtering
+- Audit logging
+- RBAC
+- Data privacy
+- Error handling (detailed in API outline)
+
+12. Implementation Strategy
+- Phase 1: Dashboard & transaction history APIs
+- Phase 2: Fund transfer API
+- Phase 3: Spending limit API
+- Phase 4: OpenAPI/Swagger spec, compliance overlays
+
+13. Technical Risks
+| Risk | Impact | Likelihood | Mitigation |
+|------|--------|-----------|------------|
+| Insufficient funds error | High | Medium | Input validation, descriptive error, audit log |
+| Unauthorized access | High | Low | OAuth, RBAC, audit logging |
+| API latency >500ms | Medium | Medium | Performance testing, scalable infra |
+| Data privacy breach | High | Low | GDPR compliance, encryption |
+| Service integration failure | Medium | Medium | Retry logic, circuit breaker |
+
+14. Technical Debt
+- Legacy account/payment services integration may require refactoring.
+- Manual RBAC configuration until automated policy management deployed.
+
+15. Appendices
+- ADR mappings (see component design)
+- Traceability matrix (requirements to APIs/services)
+
+---
+
+API Contract Outline
+
+Endpoint: GET /api/youth-accounts/{youthAccountId}/dashboard
+- Description: Retrieve youth account dashboard
+- Request: Path param youthAccountId
+- Response:
+  {
+    "youthAccountId": "string",
+    "accountBalance": "decimal",
+    "spendingLimit": "decimal",
+    "currency": "string",
+    "recentTransactions": [
+      {
+        "transactionId": "string",
+        "date": "datetime",
+        "description": "string",
+        "amount": "decimal"
+      }
+    ]
+  }
+- Error Handling: 403 Unauthorized, 404 Not Found, 500 Internal Error
+
+Endpoint: POST /api/youth-accounts/{youthAccountId}/fund-transfer
+- Description: Transfer funds from parent to youth account
+- Request Body:
+  {
+    "sourceAccountId": "string",
+    "transferAmount": "decimal",
+    "currency": "string"
+  }
+- Response:
+  {
+    "transferId": "string",
+    "status": "SUCCESS",
+    "updatedBalance": "decimal"
+  }
+- Error Handling: 400 Insufficient funds, 400 Invalid account, 500 Transfer failure
+
+Endpoint: PUT /api/youth-accounts/{youthAccountId}/spending-limit
+- Description: Configure weekly spending limit
+- Request Body:
+  {
+    "weeklyLimit": "decimal"
+  }
+- Response:
+  {
+    "youthAccountId": "string",
+    "weeklyLimit": "decimal",
+    "status": "UPDATED"
+  }
+- Error Handling: 400 Validation error, 403 Unauthorized
+
+Endpoint: GET /api/youth-accounts/{youthAccountId}/transactions
+- Description: Retrieve youth account transaction history
+- Query Params: startDate, endDate, page, pageSize
+- Response:
+  {
+    "transactions": [
+      {
+        "transactionId": "string",
+        "date": "datetime",
+        "merchant": "string",
+        "amount": "decimal",
+        "transactionType": "debit | credit"
+      }
+    ],
+    "pagination": {
+      "page": "number",
+      "pageSize": "number",
+      "totalRecords": "number"
+    }
+  }
+- Error Handling: 403 Unauthorized, 404 Not Found
+
+Authentication: OAuth token required for all endpoints
+Authorization: RBAC enforced (parent must own youth account)
+Error responses: Standardized JSON error schema with message, code
+
+---
