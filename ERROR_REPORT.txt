@@ -1,0 +1,1 @@
+GENERATION FAILED: File parsing service (503) and Knowledge Base service are unavailable. Administrator intervention required to configure BASE_API_URL/TIKA_API_URL and fix knowledge base URL protocol. Cannot proceed without access to locators, framework rules, and test case inputs.
