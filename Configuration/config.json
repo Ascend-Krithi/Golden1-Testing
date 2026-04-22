@@ -1,0 +1,10 @@
+{
+  "BaseUrl": "https://www.golden1.com/",
+  "Browser": "Chrome",
+  "ImplicitWait": 10,
+  "ExplicitWait": 30,
+  "PageLoadTimeout": 60,
+  "Environment": "Production",
+  "TakeScreenshotOnFailure": true,
+  "HighlightElements": false
+}
